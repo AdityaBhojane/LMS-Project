@@ -1,0 +1,75 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// TODO: Make relations in the Schemas
+
+model User {
+  id              String           @default(uuid())
+  firstName       String
+  lastName        String?
+  username        String
+  email           String           @unique
+  password        String
+  avatar          String? // Cloudinary imageId will be stored
+  enrolled_Course String?
+  role            Role             @default(Student)
+  CoursePurchases CoursePurchases?
+}
+
+model Course {
+  id               String   @unique @default(uuid())
+  Description      String
+  Category         String
+  Price            String
+  Thumbnail        String //Coudinary image id to be stored;
+  EnrolledStudents String
+  Lectures         String
+  Teachers         String
+  isPublished      Boolean
+  validity         DateTime // pass the default value for each course to be min 2 year 
+}
+
+model Lecture {
+  id          String   @unique @default(uuid())
+  title       String
+  description String
+  VideoUrl    String
+  UpdatedDate DateTime
+}
+
+model CoursePurchases {
+  id            String      @unique @default(uuid())
+  title         String
+  description   String
+  purchasedBy   User        @relation(fields: [id], references: [email])
+  amount        Int
+  paymentMethod PaymentMode
+  paymentId     String
+  purchasedDate DateTime
+}
+
+enum PaymentMode {
+  Card
+  Upi
+  NetBanking
+  Crypto
+  Other
+}
+
+enum Role {
+  Student
+  Teacher
+  Admin
+}
